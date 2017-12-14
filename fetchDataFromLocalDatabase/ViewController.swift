@@ -9,17 +9,37 @@
 import UIKit
 
 class ViewController: UIViewController {
-
+    var MyData : [Data]?
     override func viewDidLoad() {
         super.viewDidLoad()
+        let url = "http://localhost/projects/service.php"
+        fetchData(urlString: url)
         // Do any additional setup after loading the view, typically from a nib.
     }
-
-    override func didReceiveMemoryWarning() {
-        super.didReceiveMemoryWarning()
-        // Dispose of any resources that can be recreated.
+    func fetchData(urlString: String) {
+        
+        let jsonUrlString = urlString
+        guard let url = URL(string: jsonUrlString) else { return }
+        
+        URLSession.shared.dataTask(with: url) { (data, response, err) in
+            guard let data = data else { return }
+            do {
+                let fetchedData = try JSONDecoder().decode([Data].self, from: data)
+                
+                //*********
+                self.MyData = fetchedData
+                //********
+                
+                DispatchQueue.main.async { // Correct
+                        print(fetchedData)
+                }
+                
+            } catch let jsonErr {
+                print("Error serializing json:", jsonErr)
+            }
+            
+            }.resume()
     }
-
 
 }
 
